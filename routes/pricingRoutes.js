@@ -8,6 +8,8 @@ const sedanController = require('../controllers/sedanPricingController');
 const suvController = require('../controllers/suvPricingController');
 const hourlyController = require('../controllers/hourlyPricingController');
 const firstClassController = require('../controllers/firstClassPricingController'); // Path check kar lein
+const sprinterController = require('../controllers/sprinterPricingController');
+
 
 
 // 🏎️ Sedan Endpoint
@@ -24,6 +26,10 @@ router.post('/suv', suvController.calculateSuvDistance, hourlyController.calcula
 // First Class Pricing Route
 router.post('/first-class', firstClassController.calculateFirstClassDistance, hourlyController.calculateHourlyPrice);
 
+
+
+// 🚐 Sprinter Endpoint (Hourly Only)
+router.post('/sprinter', sprinterController.calculateSprinterDistance, hourlyController.calculateHourlyPrice);
 
 
 module.exports = router;

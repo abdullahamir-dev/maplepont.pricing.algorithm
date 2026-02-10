@@ -1,4 +1,5 @@
 const db = require('../config/db');
+const surchargeController = require('./surchargeController');
 
 
 
@@ -86,11 +87,14 @@ exports.calculateFirstClassDistance = async (req, res, next) => {
 
         }
 
-
+        //
+        const allSurcharges = await surchargeController.getFixedSurcharges();
+        const fixedSurcharges = allSurcharges['first_class'];
+        //
 
         // 4. Gross Calculation ($63 Base) & Floor Check ($122.02)
 
-        let pureGross = sheetPrice + 63.00;
+        let pureGross = sheetPrice + fixedSurcharges.base;
 
         if (inputKm <= 10 && pureGross < 122.02) {
 
@@ -134,9 +138,9 @@ exports.calculateFirstClassDistance = async (req, res, next) => {
 
         let grossCharge = pureGross;
 
-        if (lateNightSurcharge) grossCharge += 25.42;
+        if (lateNightSurcharge) grossCharge += fixedSurcharges.night;
 
-        if (meetAndGreet) grossCharge += 35.00;
+        if (meetAndGreet) grossCharge += fixedSurcharges.meetGreet;
 
 
 

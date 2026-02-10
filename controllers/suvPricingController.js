@@ -1,4 +1,6 @@
 const db = require('../config/db');
+const surchargeController = require('./surchargeController');
+
 
 exports.calculateSuvDistance = async (req, res, next) => {
     // 1. Implicit Hourly Logic (SUV Type set kar ke next kar dega)
@@ -42,8 +44,13 @@ exports.calculateSuvDistance = async (req, res, next) => {
             }
         }
 
+        //
+        const allSurcharges = await surchargeController.getFixedSurcharges();
+        const fixedSurcharges = allSurcharges['suv'];
+        //
+
         // 4. Pure Gross ($43.75 Base + Sheet) & Floor Check ($83.34)
-        let pureGross = sheetPrice + 43.75;
+        let pureGross = sheetPrice + fixedSurcharges.base;
         if (inputKm <= 10 && pureGross < 83.34) {
             pureGross = 83.34; // SUV Floor Rule
         }
@@ -64,10 +71,12 @@ exports.calculateSuvDistance = async (req, res, next) => {
             }
         }
 
+        
+
         // 6. Fixed Add-ons (Night: $14.30, M&G: $35.00)
         let grossCharge = pureGross;
-        if (lateNightSurcharge) grossCharge += 14.30;
-        if (meetAndGreet) grossCharge += 35.00;
+        if (lateNightSurcharge) grossCharge += fixedSurcharges.night;
+        if (meetAndGreet) grossCharge += fixedSurcharges.meetGreet;
 
         // 7. Final Tax (13%) & Net Price
         const subtotalForTax = grossCharge + urgentValue;

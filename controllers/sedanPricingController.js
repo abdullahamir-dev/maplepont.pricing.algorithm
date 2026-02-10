@@ -1,4 +1,6 @@
 const db = require('../config/db');
+const surchargeController = require('./surchargeController');
+
 
 exports.calculateSedanDistance = async (req, res, next) => {
     // 1. Check for Hourly Logic
@@ -50,8 +52,14 @@ exports.calculateSedanDistance = async (req, res, next) => {
             }
         }
 
+        //
+        const allSurcharges = await surchargeController.getFixedSurcharges();
+        const fixedSurcharges = allSurcharges['sedan'];
+        //
+
         // 4. Pure Gross ($35 Base + Sheet) & Floor Check ($62)
-        let pureGross = sheetPrice + 35.00;
+        let pureGross = sheetPrice + fixedSurcharges.base;
+        //console.log(pureGross);
         if (inputKm <= 8 && pureGross < 62.00) {
             pureGross = 62.00; // Sedan Floor Rule
         }
@@ -81,8 +89,8 @@ exports.calculateSedanDistance = async (req, res, next) => {
 
         // 6. Fixed Add-ons (GrossCharge Includes Night and M&G)
         let grossCharge = pureGross;
-        if (lateNightSurcharge) grossCharge += 12.50; // Sedan Night Rate
-        if (meetAndGreet) grossCharge += 35.00; // Fixed M&G
+        if (lateNightSurcharge) grossCharge += fixedSurcharges.night; // Sedan Night Rate
+        if (meetAndGreet) grossCharge += fixedSurcharges.meetGreet; // Fixed M&G
 
         // 7. Final GST (13% on GrossCharge + UrgentValue)
         const subtotalForTax = grossCharge + urgentValue;
