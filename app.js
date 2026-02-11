@@ -19,7 +19,7 @@ app.use(authMiddleware.verifyPrivateKey);
 // --- Main Routes ---
 
 // Isay '/api/pricing' kar dein taake ye cPanel ke folder structure se match kare
-app.use('/api/pricing', pricingRoutes);
+app.use('/pricing', pricingRoutes);
 
 // --- Basic Error Handling ---
 app.use((err, req, res, next) => {
