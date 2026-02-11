@@ -17,7 +17,7 @@ app.use(express.json());
 app.use(authMiddleware.verifyPrivateKey);
 
 // --- Main Routes ---
-app.use('/api/pricing', pricingRoutes);
+app.use('/pricing', pricingRoutes);
 
 // --- Basic Error Handling ---
 app.use((err, req, res, next) => {
